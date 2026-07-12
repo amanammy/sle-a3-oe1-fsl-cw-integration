@@ -1,148 +1,91 @@
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix fsl:  <https://github.com/softlang/fsl#> .
 @prefix cw:   <https://github.com/softlang/fsl/ext/cardelli-wegner#> .
 
-#################################################################
-# Assignment 3 (OE.1) — Standalone illustration of integrating
-# Cardelli & Wegner (1985) "On Understanding Types, Data
-# Abstraction, and Polymorphism" into FSL's Phase 7 concept
-# hierarchy (SL Concept Coverage / PL Concept Coverage).
-#
-# This file does NOT modify the real FSL ontology. It reuses
-# FSL's naming conventions (fsl: prefix, class/property names as
-# they appear in the FSL paper's tables) so the integration is
-# directly comparable, but lives in its own namespace (cw:) to
-# stay self-contained and gradeable in isolation.
-#
-# Scope note: only ParametricPolymorphism and InclusionPolymorphism
-# are populated with real example assertions, both via Java (an
-# entity FSL's own paper already discusses, Sec. 1.1/Fig. 2),
-# since Java exhibits both generics and subtype inheritance.
-# Overloading and Coercion are declared as classes (so the full
-# C&W taxonomy is represented) but left unpopulated -- flagged
-# explicitly as future work rather than papered over with
-# invented examples.
-#################################################################
+# SLE Assignment 3, Option OE.1
+# Adds Cardelli & Wegner's polymorphism taxonomy to FSL's typing
+# concept branch (Phase 7). Standalone -- does not modify FSL itself.
 
 <https://github.com/softlang/fsl/ext/cardelli-wegner>
     a owl:Ontology ;
-    rdfs:label "FSL x Cardelli & Wegner typing concept integration (illustrative)"@en ;
-    rdfs:comment "Standalone extension proposal for FSL Phase 7 (SL Concept Coverage). Not part of the official FSL release."@en .
+    rdfs:label "FSL + Cardelli & Wegner typing concepts"@en .
 
-#################################################################
-# TBox — new classes under FSL's existing LanguageConcept
-#################################################################
+# --- Stubs for FSL classes we attach to ---
 
-# fsl:LanguageConcept is assumed to already exist in FSL (Phase 7).
-# We only assert it here as a stub so this file is self-contained.
 fsl:LanguageConcept a owl:Class ;
-    rdfs:label "Language concept"@en ;
-    rdfs:comment "Stub reference to FSL's existing LanguageConcept class (Phase 7)."@en .
+    rdfs:label "Language concept"@en .
 
-# fsl:LanguageEntity and fsl:FormalEntity are FSL's own top-level
-# entity types (Sec. 1.1 / Fig. 3), asserted here as stubs. Note
-# that FSL keeps these disjoint: an actual programming language
-# like Java is a LanguageEntity, while a formal calculus like
-# System F is a FormalEntity -- this distinction matters for
-# which properties can validly connect to which entities below.
 fsl:LanguageEntity a owl:Class ;
     rdfs:label "Language entity"@en .
 
 fsl:FormalEntity a owl:Class ;
     rdfs:label "Formal entity"@en .
 
+# --- New typing concepts (C&W Sec. 1.3) ---
+
 cw:TypingConcept a owl:Class ;
     rdfs:subClassOf fsl:LanguageConcept ;
-    rdfs:label "Typing concept"@en ;
-    rdfs:comment "Root of the typing-related branch of FSL's concept hierarchy, populated from Cardelli & Wegner (1985)."@en .
+    rdfs:label "Typing concept"@en .
 
 cw:UniversalPolymorphism a owl:Class ;
     rdfs:subClassOf cw:TypingConcept ;
     rdfs:label "Universal polymorphism"@en ;
-    rdfs:comment "A value genuinely has many types; the same code executes uniformly across them (Cardelli & Wegner, Sec. 1.3)."@en .
+    rdfs:comment "One piece of code genuinely works across many types."@en .
 
+# Disjoint because C&W argue ad-hoc polymorphism is not true polymorphism.
 cw:AdHocPolymorphism a owl:Class ;
     rdfs:subClassOf cw:TypingConcept ;
     rdfs:label "Ad-hoc polymorphism"@en ;
-    rdfs:comment "Apparent polymorphism only: different code runs per type, or a symbol denotes distinct functions (Cardelli & Wegner, Sec. 1.3)."@en ;
+    rdfs:comment "Apparent polymorphism only; different code runs per type."@en ;
     owl:disjointWith cw:UniversalPolymorphism .
 
 cw:ParametricPolymorphism a owl:Class ;
     rdfs:subClassOf cw:UniversalPolymorphism ;
     rdfs:label "Parametric polymorphism"@en ;
-    rdfs:comment "A function works uniformly on a range of types via a type parameter, e.g. a generic length function (Cardelli & Wegner, Sec. 1.3)."@en .
+    rdfs:comment "Generic functions, e.g. a length function over any list."@en .
 
 cw:InclusionPolymorphism a owl:Class ;
     rdfs:subClassOf cw:UniversalPolymorphism ;
     rdfs:label "Inclusion polymorphism"@en ;
-    rdfs:comment "Subtyping/inheritance: an object of a subtype may be used wherever a supertype is expected (Cardelli & Wegner, Sec. 1.3). NOT YET POPULATED -- no OO language entity is present in FSL's published seed set; left as future work."@en .
+    rdfs:comment "Subtyping: a subtype may be used where a supertype is expected."@en .
 
 cw:Overloading a owl:Class ;
     rdfs:subClassOf cw:AdHocPolymorphism ;
     rdfs:label "Overloading"@en ;
-    rdfs:comment "The same name denotes different, unrelated functions, resolved statically (Cardelli & Wegner, Sec. 1.3). NOT YET POPULATED -- future work."@en .
+    rdfs:comment "One name, several unrelated functions."@en .
 
 cw:Coercion a owl:Class ;
     rdfs:subClassOf cw:AdHocPolymorphism ;
     rdfs:label "Coercion"@en ;
-    rdfs:comment "An automatic, implicit type conversion inserted to avoid a type error (Cardelli & Wegner, Sec. 1.3). NOT YET POPULATED -- future work."@en .
+    rdfs:comment "Implicit type conversion inserted to avoid a type error."@en .
 
-#################################################################
-# TBox — reused FSL properties (not new relations)
-#################################################################
+# --- FSL properties, reused rather than replaced ---
 
-# fsl:supports already exists in FSL's property table
-# (domain: LanguageEntity, range: LanguageConcept). We reuse it
-# rather than inventing a new property, to keep the integration
-# consistent with FSL's existing modeling conventions.
+# supports: LanguageEntity -> LanguageConcept
 fsl:supports a owl:ObjectProperty ;
-    rdfs:label "supports"@en ;
-    rdfs:comment "Stub reference to FSL's existing 'supports' property (LanguageEntity -> LanguageConcept)."@en .
+    rdfs:label "supports"@en .
 
-# fsl:uses already exists in FSL's property table
-# (domain: Entity, range: Entity -- fully generic). FSL itself
-# uses this property to relate formal entities to one another,
-# e.g. "denotational semantics uses lambda calculus" (Sec. 1.1).
-# We reuse it the same way, to relate a typing concept to the
-# formal calculus that specifies it.
+# uses: Entity -> Entity
 fsl:uses a owl:ObjectProperty ;
-    rdfs:label "uses"@en ;
-    rdfs:comment "Stub reference to FSL's existing 'uses' property (Entity -> Entity)."@en .
+    rdfs:label "uses"@en .
 
-#################################################################
-# ABox — example assertions using FSL's existing entities
-#################################################################
+# --- Assertions ---
 
-# fsl:Java is a real, already-existing FSL LanguageEntity,
-# explicitly discussed in the FSL paper's own worked example of
-# language concepts (Sec. 1.1, Fig. 2: "Java as a programming
-# language versus OCL as a non-programming language"). Stub
-# asserted here for self-containment.
 fsl:Java a fsl:LanguageEntity ;
     rdfs:label "Java"@en .
 
-# Java exhibits parametric polymorphism via generics, and
-# inclusion polymorphism via class/interface subtyping -- so one
-# real, already-existing FSL entity is enough to populate two of
-# the four leaf classes correctly, with no invented entities.
+# Generics and subtyping respectively.
 fsl:Java fsl:supports cw:ParametricPolymorphism .
 fsl:Java fsl:supports cw:InclusionPolymorphism .
 
-# fsl:SystemF is assumed to already exist in FSL's seed set
-# (Table 4), correctly typed as FormalEntity (per Sec. 1.1:
-# "'Formal entity' is root to ... formal systems (such as lambda
-# and process calculi ...)"), not LanguageEntity. Stub asserted
-# here for self-containment.
 fsl:SystemF a fsl:FormalEntity ;
     rdfs:label "System F"@en .
 
-# The concept "uses" the calculus that formally specifies it,
-# mirroring FSL's own real use of 'uses' between formal entities
-# (Sec. 1.1). System F is specifically the calculus Cardelli &
-# Wegner (and follow-up work, e.g. Girard, Reynolds) use to
-# formalize universal quantification, i.e. parametric
-# polymorphism.
+# 'uses', not 'supports': System F is a FormalEntity, and supports
+# is restricted to LanguageEntity.
 cw:ParametricPolymorphism fsl:uses fsl:SystemF .
+
+# Overloading and Coercion are left unpopulated. FSL has no suitable
+# entity for them yet and inventing one would misrepresent the ontology.
