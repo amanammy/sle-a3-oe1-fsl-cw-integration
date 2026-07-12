@@ -35,6 +35,7 @@ cw:UniversalPolymorphism a owl:Class ;
     rdfs:comment "One piece of code genuinely works across many types."@en .
 
 # Disjoint because C&W argue ad-hoc polymorphism is not true polymorphism.
+
 cw:AdHocPolymorphism a owl:Class ;
     rdfs:subClassOf cw:TypingConcept ;
     rdfs:label "Ad-hoc polymorphism"@en ;
@@ -71,7 +72,6 @@ fsl:supports a owl:ObjectProperty ;
 fsl:uses a owl:ObjectProperty ;
     rdfs:label "uses"@en .
 
-# --- Assertions ---
 
 fsl:Java a fsl:LanguageEntity ;
     rdfs:label "Java"@en .
@@ -83,8 +83,7 @@ fsl:Java fsl:supports cw:InclusionPolymorphism .
 fsl:SystemF a fsl:FormalEntity ;
     rdfs:label "System F"@en .
 
-# 'uses', not 'supports': System F is a FormalEntity, and supports
-# is restricted to LanguageEntity.
+
 cw:ParametricPolymorphism fsl:uses fsl:SystemF .
 
 # Overloading and Coercion are left unpopulated. FSL has no suitable
