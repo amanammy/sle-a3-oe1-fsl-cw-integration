@@ -20,13 +20,20 @@ taxonomy:
 - Overloading
 - Coercion
 
-Only parametric polymorphism is actually connected to real FSL entities
-(System F, simply typed lambda calculus), using FSL's existing `supports`
-property. The other three classes are defined but left unpopulated on
-purpose — FSL's own seed set doesn't currently include an object-oriented
-language or overloading/coercion examples, so populating those would mean
-inventing entities that aren't part of the actual FSL ontology. That's
-noted as future work rather than filled in artificially.
+Two of the four are actually connected to a real FSL entity: Java, which
+FSL's own paper already discusses as an example language. Java supports
+both parametric polymorphism (generics) and inclusion polymorphism
+(subtyping/inheritance), using FSL's existing `supports` property. System
+F is also included, correctly typed as a formal entity (not a language
+entity, which matters for which properties can connect to it), linked via
+FSL's existing `uses` property to show it's the calculus that formalizes
+parametric polymorphism.
+
+Overloading and coercion are defined as classes but left unpopulated on
+purpose — FSL doesn't currently have a clean existing example entity for
+either, so populating them here would mean inventing something not part
+of the actual FSL ontology. That's noted as future work rather than
+filled in artificially.
 
 This is a standalone illustration, not a fork of the real FSL ontology — it
 reuses FSL's naming and property conventions but lives in its own namespace.
