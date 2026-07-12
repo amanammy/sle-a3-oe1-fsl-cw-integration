@@ -1,0 +1,111 @@
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix fsl:  <https://github.com/softlang/fsl#> .
+@prefix cw:   <https://github.com/softlang/fsl/ext/cardelli-wegner#> .
+
+#################################################################
+# Assignment 3 (OE.1) — Standalone illustration of integrating
+# Cardelli & Wegner (1985) "On Understanding Types, Data
+# Abstraction, and Polymorphism" into FSL's Phase 7 concept
+# hierarchy (SL Concept Coverage / PL Concept Coverage).
+#
+# This file does NOT modify the real FSL ontology. It reuses
+# FSL's naming conventions (fsl: prefix, class/property names as
+# they appear in the FSL paper's tables) so the integration is
+# directly comparable, but lives in its own namespace (cw:) to
+# stay self-contained and gradeable in isolation.
+#
+# Scope note: only ParametricPolymorphism is populated with real
+# example assertions (System F, simply typed lambda calculus),
+# because those are the only typing-related entities present in
+# FSL's published seed set. InclusionPolymorphism, Overloading
+# and Coercion are declared as classes (so the full C&W taxonomy
+# is represented) but left unpopulated -- flagged explicitly as
+# future work rather than papered over with invented examples.
+#################################################################
+
+<https://github.com/softlang/fsl/ext/cardelli-wegner>
+    a owl:Ontology ;
+    rdfs:label "FSL x Cardelli & Wegner typing concept integration (illustrative)"@en ;
+    rdfs:comment "Standalone extension proposal for FSL Phase 7 (SL Concept Coverage). Not part of the official FSL release."@en .
+
+#################################################################
+# TBox — new classes under FSL's existing LanguageConcept
+#################################################################
+
+# fsl:LanguageConcept is assumed to already exist in FSL (Phase 7).
+# We only assert it here as a stub so this file is self-contained.
+fsl:LanguageConcept a owl:Class ;
+    rdfs:label "Language concept"@en ;
+    rdfs:comment "Stub reference to FSL's existing LanguageConcept class (Phase 7)."@en .
+
+cw:TypingConcept a owl:Class ;
+    rdfs:subClassOf fsl:LanguageConcept ;
+    rdfs:label "Typing concept"@en ;
+    rdfs:comment "Root of the typing-related branch of FSL's concept hierarchy, populated from Cardelli & Wegner (1985)."@en .
+
+cw:UniversalPolymorphism a owl:Class ;
+    rdfs:subClassOf cw:TypingConcept ;
+    rdfs:label "Universal polymorphism"@en ;
+    rdfs:comment "A value genuinely has many types; the same code executes uniformly across them (Cardelli & Wegner, Sec. 1.3)."@en .
+
+cw:AdHocPolymorphism a owl:Class ;
+    rdfs:subClassOf cw:TypingConcept ;
+    rdfs:label "Ad-hoc polymorphism"@en ;
+    rdfs:comment "Apparent polymorphism only: different code runs per type, or a symbol denotes distinct functions (Cardelli & Wegner, Sec. 1.3)."@en ;
+    owl:disjointWith cw:UniversalPolymorphism .
+
+cw:ParametricPolymorphism a owl:Class ;
+    rdfs:subClassOf cw:UniversalPolymorphism ;
+    rdfs:label "Parametric polymorphism"@en ;
+    rdfs:comment "A function works uniformly on a range of types via a type parameter, e.g. a generic length function (Cardelli & Wegner, Sec. 1.3)."@en .
+
+cw:InclusionPolymorphism a owl:Class ;
+    rdfs:subClassOf cw:UniversalPolymorphism ;
+    rdfs:label "Inclusion polymorphism"@en ;
+    rdfs:comment "Subtyping/inheritance: an object of a subtype may be used wherever a supertype is expected (Cardelli & Wegner, Sec. 1.3). NOT YET POPULATED -- no OO language entity is present in FSL's published seed set; left as future work."@en .
+
+cw:Overloading a owl:Class ;
+    rdfs:subClassOf cw:AdHocPolymorphism ;
+    rdfs:label "Overloading"@en ;
+    rdfs:comment "The same name denotes different, unrelated functions, resolved statically (Cardelli & Wegner, Sec. 1.3). NOT YET POPULATED -- future work."@en .
+
+cw:Coercion a owl:Class ;
+    rdfs:subClassOf cw:AdHocPolymorphism ;
+    rdfs:label "Coercion"@en ;
+    rdfs:comment "An automatic, implicit type conversion inserted to avoid a type error (Cardelli & Wegner, Sec. 1.3). NOT YET POPULATED -- future work."@en .
+
+#################################################################
+# TBox — reused FSL property (not a new relation)
+#################################################################
+
+# fsl:supports already exists in FSL's property table
+# (domain: LanguageEntity, range: LanguageConcept). We reuse it
+# rather than inventing a new property, to keep the integration
+# consistent with FSL's existing modeling conventions.
+fsl:supports a owl:ObjectProperty ;
+    rdfs:label "supports"@en ;
+    rdfs:comment "Stub reference to FSL's existing 'supports' property (LanguageEntity -> LanguageConcept)."@en .
+
+#################################################################
+# ABox — example assertions using FSL's existing seed-set entities
+#################################################################
+
+# fsl:SystemF and fsl:SimplyTypedLambdaCalculus are assumed to
+# already exist in FSL's seed set (Table 4 of the FSL paper).
+# Stubs asserted here for self-containment.
+fsl:SystemF a fsl:LanguageEntity ;
+    rdfs:label "System F"@en .
+
+fsl:SimplyTypedLambdaCalculus a fsl:LanguageEntity ;
+    rdfs:label "Simply typed lambda calculus"@en .
+
+fsl:SystemF fsl:supports cw:ParametricPolymorphism .
+fsl:SimplyTypedLambdaCalculus fsl:supports cw:ParametricPolymorphism .
+
+# Note: System F is specifically the calculus C&W and follow-up
+# work (e.g. Girard, Reynolds) use to formalize universal
+# quantification -- i.e. parametric polymorphism -- which is why
+# it is the strongest and least controversial assertion here.
