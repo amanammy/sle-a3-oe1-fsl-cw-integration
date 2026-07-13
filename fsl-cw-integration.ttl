@@ -1,90 +1,154 @@
+@prefix ce:   <http://www.softlang.org/ontologies/ce#> .
+@prefix pe:   <http://www.softlang.org/ontologies/pe#> .
+@prefix tbox: <http://www.softlang.org/ontologies/tbox#> .
+@prefix cw:   <http://www.softlang.org/ontologies/cw#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix fsl:  <https://github.com/softlang/fsl#> .
-@prefix cw:   <https://github.com/softlang/fsl/ext/cardelli-wegner#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
 # SLE Assignment 3, Option OE.1
-# Adds Cardelli & Wegner's polymorphism taxonomy to FSL's typing
-# concept branch (Phase 7). Standalone -- does not modify FSL itself.
+# Integrating Figure 1 of Cardelli & Wegner (1985) -- the varieties of
+# polymorphism -- into FSL. Checked against the FSL repo, July 2026.
+#
+# Finding: FSL's language-concept model has no concept-to-concept
+# specialization relation. Concepts are individuals, flat within their
+# facet. hasComponent is part-of, not kind-of. hasDominantForm is
+# per-language, inside a reified assertion. C&W's Figure 1 is nothing but
+# kind-of relations, so it cannot currently be expressed.
+#
+# This file imports FSL's tbox and proposes one property, tbox:refines,
+# plus the concept individuals C&W's taxonomy needs but FSL lacks.
 
-<https://github.com/softlang/fsl/ext/cardelli-wegner>
+<http://www.softlang.org/ontologies/cw>
     a owl:Ontology ;
-    rdfs:label "FSL + Cardelli & Wegner typing concepts"@en .
+    rdfs:label "Cardelli & Wegner polymorphism taxonomy, proposed FSL integration"@en ;
+    rdfs:comment "Proposed extension. Not part of the FSL release."@en ;
+    owl:imports <http://www.softlang.org/ontologies/tbox> .
 
-# --- Stubs for FSL classes we attach to ---
+#################################################################
+# Proposed TBox addition: one property
+#################################################################
 
-fsl:LanguageConcept a owl:Class ;
-    rdfs:label "Language concept"@en .
+# The missing relation. Follows FSL's existing property style:
+# typed as PropertyEntity, domain/range declared, inverse declared.
+# Transitive and asymmetric, as a specialization hierarchy should be.
+tbox:refines a owl:ObjectProperty,
+        owl:TransitiveProperty,
+        owl:AsymmetricProperty,
+        owl:IrreflexiveProperty,
+        tbox:PropertyEntity ;
+    rdfs:label "refines"@en ;
+    rdfs:comment "Relates a language concept to a more general language concept that it specializes"@en ;
+    rdfs:domain tbox:LanguageConcept ;
+    rdfs:range tbox:LanguageConcept ;
+    owl:inverseOf tbox:isRefinedBy ;
+    foaf:page <https://en.wikipedia.org/wiki/Is-a> .
 
-fsl:LanguageEntity a owl:Class ;
-    rdfs:label "Language entity"@en .
+tbox:isRefinedBy a owl:ObjectProperty,
+        tbox:PropertyEntity ;
+    rdfs:label "is refined by"@en ;
+    rdfs:comment "Relates a language concept to a more specific language concept that specializes it"@en ;
+    rdfs:domain tbox:LanguageConcept ;
+    rdfs:range tbox:LanguageConcept ;
+    owl:inverseOf tbox:refines ;
+    foaf:page <https://en.wikipedia.org/wiki/Is-a> .
 
-fsl:FormalEntity a owl:Class ;
-    rdfs:label "Formal entity"@en .
+#################################################################
+# Missing TypeConcept individuals
+#################################################################
 
-# --- New typing concepts (C&W Sec. 1.3) ---
+# FSL has AdHocPolymorphism and ParametricPolymorphism, but no root
+# concept for polymorphism itself. Other facets do have such a root
+# (Abstraction, EvaluationStrategy, Scope, Lifetime, Types).
+ce:Polymorphism a ce:TypeConcept,
+        tbox:ConceptualEntity ;
+    rdfs:label "Polymorphism"@en ;
+    rdfs:comment "Some values or variables may have more than one type"@en ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Polymorphism_(computer_science)> .
 
-cw:TypingConcept a owl:Class ;
-    rdfs:subClassOf fsl:LanguageConcept ;
-    rdfs:label "Typing concept"@en .
-
-cw:UniversalPolymorphism a owl:Class ;
-    rdfs:subClassOf cw:TypingConcept ;
+# The counterpart that gives "ad hoc" its meaning. Absent from FSL.
+ce:UniversalPolymorphism a ce:TypeConcept,
+        tbox:ConceptualEntity ;
     rdfs:label "Universal polymorphism"@en ;
-    rdfs:comment "One piece of code genuinely works across many types."@en .
+    rdfs:comment "The same code executes for arguments of any admissible type"@en ;
+    foaf:page <https://en.wikipedia.org/wiki/Polymorphism_(computer_science)> .
 
-# Disjoint because C&W argue ad-hoc polymorphism is not true polymorphism.
-
-cw:AdHocPolymorphism a owl:Class ;
-    rdfs:subClassOf cw:TypingConcept ;
-    rdfs:label "Ad-hoc polymorphism"@en ;
-    rdfs:comment "Apparent polymorphism only; different code runs per type."@en ;
-    owl:disjointWith cw:UniversalPolymorphism .
-
-cw:ParametricPolymorphism a owl:Class ;
-    rdfs:subClassOf cw:UniversalPolymorphism ;
-    rdfs:label "Parametric polymorphism"@en ;
-    rdfs:comment "Generic functions, e.g. a length function over any list."@en .
-
-cw:InclusionPolymorphism a owl:Class ;
-    rdfs:subClassOf cw:UniversalPolymorphism ;
-    rdfs:label "Inclusion polymorphism"@en ;
-    rdfs:comment "Subtyping: a subtype may be used where a supertype is expected."@en .
-
-cw:Overloading a owl:Class ;
-    rdfs:subClassOf cw:AdHocPolymorphism ;
+# The two members of ad-hoc polymorphism. Both absent from FSL, which
+# is why "Java nativelySupports ce:AdHocPolymorphism" cannot be refined.
+ce:Overloading a ce:TypeConcept,
+        tbox:ConceptualEntity ;
     rdfs:label "Overloading"@en ;
-    rdfs:comment "One name, several unrelated functions."@en .
+    rdfs:comment "The same name denotes different functions, resolved from context"@en ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Function_overloading> .
 
-cw:Coercion a owl:Class ;
-    rdfs:subClassOf cw:AdHocPolymorphism ;
+ce:Coercion a ce:TypeConcept,
+        tbox:ConceptualEntity ;
     rdfs:label "Coercion"@en ;
-    rdfs:comment "Implicit type conversion inserted to avoid a type error."@en .
+    rdfs:comment "A conversion inserted to avoid a type error"@en ;
+    foaf:isPrimaryTopicOf <https://en.wikipedia.org/wiki/Type_conversion> .
 
-# --- FSL properties, reused rather than replaced ---
+#################################################################
+# Missing implementation mechanism
+#################################################################
 
-# supports: LanguageEntity -> LanguageConcept
-fsl:supports a owl:ObjectProperty ;
-    rdfs:label "supports"@en .
+# FSL already has TypeClassBasedMechanism, used for Haskell. Java
+# realizes ad-hoc polymorphism differently.
+ce:MethodOverloadingMechanism a tbox:ImplementationMechanismConcept,
+        tbox:ConceptualEntity ;
+    rdfs:label "Method-overloading mechanism"@en ;
+    rdfs:comment "Static resolution of an overloaded name by argument types"@en ;
+    foaf:page <https://en.wikipedia.org/wiki/Function_overloading> .
 
-# uses: Entity -> Entity
-fsl:uses a owl:ObjectProperty ;
-    rdfs:label "uses"@en .
+#################################################################
+# C&W Figure 1, as four refines triples
+#################################################################
 
+ce:UniversalPolymorphism tbox:refines ce:Polymorphism .
+ce:AdHocPolymorphism tbox:refines ce:Polymorphism .
 
-fsl:Java a fsl:LanguageEntity ;
-    rdfs:label "Java"@en .
+ce:ParametricPolymorphism tbox:refines ce:UniversalPolymorphism .
 
-# Generics and subtyping respectively.
-fsl:Java fsl:supports cw:ParametricPolymorphism .
-fsl:Java fsl:supports cw:InclusionPolymorphism .
+# C&W, Sec. 1.3: "Subtyping is an instance of inclusion polymorphism."
+# FSL has Subtyping but never relates it to polymorphism at all.
+ce:Subtyping tbox:refines ce:UniversalPolymorphism ;
+    skos:note "Cardelli & Wegner call this inclusion polymorphism."@en .
 
-fsl:SystemF a fsl:FormalEntity ;
-    rdfs:label "System F"@en .
+ce:Overloading tbox:refines ce:AdHocPolymorphism .
+ce:Coercion tbox:refines ce:AdHocPolymorphism .
 
+#################################################################
+# The same property retrofits other facets
+#################################################################
 
-cw:ParametricPolymorphism fsl:uses fsl:SystemF .
+# The gap is not specific to typing. 15 of FSL's 18 concept facets
+# contain a root concept sitting flat alongside its own specializations.
+# Two examples, to show tbox:refines is not a one-off.
 
-# Overloading and Coercion are left unpopulated. FSL has no suitable
-# entity for them yet and inventing one would misrepresent the ontology.
+ce:LazyEvaluation tbox:refines ce:EvaluationStrategy .
+ce:LexicalScope tbox:refines ce:Scope .
+
+#################################################################
+# Refined support assertions, using FSL's existing machinery
+#################################################################
+
+# FSL asserts "Java nativelySupports ce:AdHocPolymorphism" but has no
+# vocabulary to say how. With Overloading in place, FSL's existing
+# LanguageSupportAssertion pattern can now express it -- exactly as FSL
+# already does for Haskell's evaluation strategy.
+pe:Java_AdHocPolymorphism_assertion a tbox:LanguageSupportAssertion ;
+    tbox:assertedForConcept ce:AdHocPolymorphism ;
+    tbox:assertedForLanguage pe:Java ;
+    tbox:hasDominantForm ce:Overloading ;
+    tbox:hasPrimaryMechanism ce:MethodOverloadingMechanism ;
+    tbox:hasSupportKind ce:NativeSupport ;
+    skos:note "Java also performs numeric coercion; overloading is the dominant form."@en .
+
+# Same concept, different mechanism. FSL already had the mechanism; it
+# had nothing in the typing branch to attach it to.
+pe:Haskell_AdHocPolymorphism_assertion a tbox:LanguageSupportAssertion ;
+    tbox:assertedForConcept ce:AdHocPolymorphism ;
+    tbox:assertedForLanguage pe:Haskell ;
+    tbox:hasDominantForm ce:Overloading ;
+    tbox:hasPrimaryMechanism ce:TypeClassBasedMechanism ;
+    tbox:hasSupportKind ce:NativeSupport .
