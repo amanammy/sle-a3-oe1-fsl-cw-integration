@@ -1,7 +1,6 @@
 @prefix ce:   <http://www.softlang.org/ontologies/ce#> .
 @prefix pe:   <http://www.softlang.org/ontologies/pe#> .
 @prefix tbox: <http://www.softlang.org/ontologies/tbox#> .
-@prefix cw:   <http://www.softlang.org/ontologies/cw#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -32,11 +31,16 @@
 
 # The missing relation. Follows FSL's existing property style:
 # typed as PropertyEntity, domain/range declared, inverse declared.
-# Transitive and asymmetric, as a specialization hierarchy should be.
+#
+# Transitive, like rdfs:subClassOf: if overloading refines ad-hoc
+# polymorphism and ad-hoc refines polymorphism, then overloading refines
+# polymorphism. Deliberately NOT declared asymmetric or irreflexive:
+# OWL 2 DL requires non-simple (transitive) properties to be simple for
+# those characteristics, so declaring both would push the ontology out of
+# OWL 2 DL. FSL resolves the same trade-off in the other direction for
+# tbox:hasPart, which is asymmetric and irreflexive but not transitive.
 tbox:refines a owl:ObjectProperty,
         owl:TransitiveProperty,
-        owl:AsymmetricProperty,
-        owl:IrreflexiveProperty,
         tbox:PropertyEntity ;
     rdfs:label "refines"@en ;
     rdfs:comment "Relates a language concept to a more general language concept that it specializes"@en ;
