@@ -9,13 +9,8 @@
 # SLE Assignment 3, Option OE.1
 # Integrating Figure 1 of Cardelli & Wegner (1985) -- the varieties of
 # polymorphism -- into FSL. Checked against the FSL repo, July 2026.
-#
-# Finding: FSL's language-concept model has no concept-to-concept
-# specialization relation. Concepts are individuals, flat within their
-# facet. hasComponent is part-of, not kind-of. hasDominantForm is
-# per-language, inside a reified assertion. C&W's Figure 1 is nothing but
-# kind-of relations, so it cannot currently be expressed.
-#
+
+
 # This file imports FSL's tbox and proposes one property, tbox:refines,
 # plus the concept individuals C&W's taxonomy needs but FSL lacks.
 
@@ -32,13 +27,7 @@
 # The missing relation. Follows FSL's existing property style:
 # typed as PropertyEntity, domain/range declared, inverse declared.
 #
-# Transitive, like rdfs:subClassOf: if overloading refines ad-hoc
-# polymorphism and ad-hoc refines polymorphism, then overloading refines
-# polymorphism. Deliberately NOT declared asymmetric or irreflexive:
-# OWL 2 DL requires non-simple (transitive) properties to be simple for
-# those characteristics, so declaring both would push the ontology out of
-# OWL 2 DL. FSL resolves the same trade-off in the other direction for
-# tbox:hasPart, which is asymmetric and irreflexive but not transitive.
+
 tbox:refines a owl:ObjectProperty,
         owl:TransitiveProperty,
         tbox:PropertyEntity ;
@@ -136,10 +125,7 @@ ce:LexicalScope tbox:refines ce:Scope .
 # Refined support assertions, using FSL's existing machinery
 #################################################################
 
-# FSL asserts "Java nativelySupports ce:AdHocPolymorphism" but has no
-# vocabulary to say how. With Overloading in place, FSL's existing
-# LanguageSupportAssertion pattern can now express it -- exactly as FSL
-# already does for Haskell's evaluation strategy.
+
 pe:Java_AdHocPolymorphism_assertion a tbox:LanguageSupportAssertion ;
     tbox:assertedForConcept ce:AdHocPolymorphism ;
     tbox:assertedForLanguage pe:Java ;
